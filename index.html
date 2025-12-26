@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Para ti, mi amor</title>
+  <link rel="icon" href="❤️">
+  <style>
+    :root {
+      --neon-purple: #cc00ff;
+      --neon-purple-glow: #e600ff;
+      --dark-bg: #0a0015;
+      --text-color: #ffffff;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--dark-bg);
+      font-family: 'Courier New', monospace;
+      color: var(--text-color);
+      min-height: 100vh;
+      overflow-x: hidden;
+      padding: 20px;
+      text-shadow: 0 0 5px rgba(204, 0, 255, 0.7);
+      position: relative;
+    }
+
+    /* Corazones flotantes de fondo (siempre presentes) */
+    .hearts {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .heart {
+      position: absolute;
+      font-size: 24px;
+      opacity: 0;
+      animation: float 8s infinite ease-in-out;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+    }
+
+    /* --- Pantalla inicial mejorada --- */
+    .welcome-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 20;
+      background: rgba(10, 0, 21, 0.9);
+      backdrop-filter: blur(5px);
+      text-align: center;
+      padding: 20px;
+    }
+
+    .welcome-heart {
+      font-size: 5rem;
+      margin-bottom: 25px;
+      color: var(--neon-purple);
+      text-shadow: 0 0 15px var(--neon-purple-glow);
+      animation: heartbeat 1.4s infinite;
+    }
+
+    @keyframes heartbeat {
+      0% { transform: scale(1); }
+      14% { transform: scale(1.1); }
+      28% { transform: scale(1); }
+      42% { transform: scale(1.1); }
+      70% { transform: scale(1); }
+    }
+
+    .welcome-title {
+      font-size: 2.2rem;
+      margin-bottom: 10px;
+      color: white;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+      letter-spacing: 1px;
+    }
+
+    .welcome-subtitle {
+      font-size: 1.2rem;
+      margin-bottom: 30px;
+      max-width: 600px;
+      line-height: 1.5;
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    #startBtn {
+      width: 280px;
+      padding: 16px;
+      background: transparent;
+      border: 2px solid var(--neon-purple);
+      color: var(--neon-purple);
+      font-family: inherit;
+      font-size: 1.2rem;
+      font-weight: bold;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.4s ease;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+      box-shadow: 0 0 15px rgba(204, 0, 255, 0.4);
+    }
+
+    #startBtn:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: var(--neon-purple);
+      transition: all 0.6s ease;
+      z-index: -1;
+    }
+
+    #startBtn:hover:before {
+      left: 0;
+    }
+
+    #startBtn:hover {
+      color: #0a0015;
+      box-shadow: 0 0 25px var(--neon-purple-glow);
+      transform: scale(1.05);
+    }
+
+    /* --- Contenido principal (oculto al inicio) --- */
+    .container {
+    max-width: 700px;
+    width: 100%;
+    padding: 30px;
+    background: rgba(10, 0, 21, 0.7);
+    border: 1px solid var(--neon-purple);
+    border-radius: 15px;
+    box-shadow: 0 0 20px var(--neon-purple-glow);
+    backdrop-filter: blur(10px);
+    z-index: 10;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 1s ease, transform 1s ease;
+
+    /* Centrado manual */
+    margin-left: auto;
+    margin-right: auto;
+    position: relative; /* Solo si es necesario, pero no afecta el centrado */
+    }
+
+    .container.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .terminal-header {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 1.2rem;
+      color: var(--neon-purple);
+      letter-spacing: 1px;
+      opacity: 0.8;
+    }
+
+    .title {
+      font-size: 2.5rem;
+      text-align: center;
+      color: var(--neon-purple);
+      text-shadow: 0 0 10px var(--neon-purple-glow);
+      margin: 20px 0;
+      animation: pulse 1.5s infinite alternate;
+    }
+
+    @keyframes pulse {
+      from { transform: scale(1); }
+      to { transform: scale(1.05); }
+    }
+
+    p, .counter {
+      font-size: 1.2rem;
+      line-height: 1.6;
+      margin: 15px 0;
+      text-align: center;
+    }
+
+    .counter {
+      font-weight: bold;
+      color: #d4005f;
+    }
+
+    .reasons {
+      margin: 25px 0;
+    }
+
+    .reason {
+      opacity: 0;
+      transform: translateX(-20px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+      margin: 12px 0;
+      text-align: center;
+    }
+
+    .reason.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .final-message {
+      font-size: 1.3rem;
+      color: #a0004c;
+      font-style: italic;
+      margin-top: 25px;
+      text-align: center;
+      opacity: 0;
+      transition: opacity 2s;
+    }
+
+    .final-message.show {
+      opacity: 1;
+    }
+
+    .input-group {
+      margin: 25px 0;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 15px;
+      background: rgba(20, 0, 30, 0.6);
+      border: 2px solid var(--neon-purple);
+      border-radius: 8px;
+      color: white;
+      font-family: inherit;
+      font-size: 1rem;
+      outline: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 8px rgba(204, 0, 255, 0.3);
+    }
+
+    input:focus {
+      border-color: var(--neon-purple-glow);
+      box-shadow: 0 0 15px var(--neon-purple-glow);
+      background: rgba(30, 0, 40, 0.7);
+    }
+
+    button#formarBtn {
+      width: 100%;
+      padding: 12px;
+      background: transparent;
+      border: 2px solid var(--neon-purple);
+      color: var(--neon-purple);
+      font-family: inherit;
+      font-size: 1.1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    button#formarBtn:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: var(--neon-purple);
+      transition: all 0.4s ease;
+      z-index: -1;
+    }
+
+    button#formarBtn:hover:before {
+      left: 0;
+    }
+
+    button#formarBtn:hover {
+      color: #0a0015;
+      box-shadow: 0 0 15px var(--neon-purple-glow);
+    }
+
+    .result {
+      margin-top: 30px;
+      padding: 20px;
+      background: rgba(20, 0, 30, 0.5);
+      border-radius: 10px;
+      border: 1px dashed var(--neon-purple);
+      min-height: 200px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    .result.show {
+      opacity: 1;
+    }
+
+    .heart-container {
+      font-size: 0.95rem;
+      line-height: 1.2;
+      margin: 15px 0;
+      white-space: pre-wrap;
+      font-weight: bold;
+      color: var(--neon-purple);
+      text-shadow: 0 0 8px var(--neon-purple-glow);
+      font-family: 'Courier New', monospace;
+    }
+
+    .signature {
+      margin-top: 20px;
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.6);
+      letter-spacing: 1px;
+    }
+
+    @media (max-width: 700px) {
+      .welcome-title { font-size: 1.8rem; }
+      .welcome-subtitle { font-size: 1rem; }
+      #startBtn { width: 240px; font-size: 1.1rem; padding: 14px; }
+      .container { padding: 20px; }
+      .title { font-size: 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Corazones flotantes (siempre activos) -->
+  <div class="hearts" id="hearts"></div>
+
+  <!-- Pantalla de bienvenida mejorada -->
+  <div class="welcome-screen" id="welcomeScreen">
+    <div class="welcome-heart">❤️</div>
+    <h1 class="welcome-title">Para ti, mi amor</h1>
+    <p class="welcome-subtitle">Una carta llena de razones por las que te amo... y un corazón hecho con tu nombre.</p>
+    <button id="startBtn">Ábrelo cuando quieras</button>
+  </div>
+
+  <!-- Contenido principal (oculto al inicio) -->
+  <div class="container" id="container">
+    <div class="terminal-header">Te amo, mi vida</div>
+    <h1 class="title">❤️ Para ti, cosita ❤️</h1>
+
+    <p>Hola, mi vida. Hoy quiero recordarte lo mucho que significas para mí.</p>
+
+    <div class="counter" id="counter">Llevamos juntos <span id="days">...</span> días.</div>
+
+    <div class="reasons" id="reasons">
+      <p><strong>Razones por las que te amo:</strong></p>
+    </div>
+
+    <div class="input-group">
+      <input type="text" id="nombreInput" placeholder="Tu nombre..." autocomplete="off">
+    </div>
+    <button id="formarBtn">Formar Corazón</button>
+
+    <div class="result" id="resultado">
+      <div class="heart-container" id="corazonDisplay"></div>
+      <div class="signature">@testi</div>
+    </div>
+
+    <p class="final-message" id="finalMessage">...</p>
+  </div>
+
+  <script>
+    const startDate = new Date('2025-10-30'); // ¡AJUSTA ESTA FECHA!
+
+    const welcomeScreen = document.getElementById('welcomeScreen');
+    const container = document.getElementById('container');
+    const reasonsContainer = document.getElementById('reasons');
+    const finalMessage = document.getElementById('finalMessage');
+    const daysElement = document.getElementById('days');
+
+    const reasons = [
+      "Por tu sonrisa que ilumina hasta mi peor día.",
+      "Por cómo me cuentas todo.",
+      "Porque contigo, todo es más bonito.",
+      "Por tu paciencia infinita (casi).",
+      "Porque me haces creer en el amor verdadero.",
+      "Por cómo ríes de mis chistes malos.",
+      "Porque eres mi lugar seguro, como haces que no me sienta solo.",
+      "Porque me amás tal como soy."
+    ];
+
+    const specialMessage = "Y aunque el mundo cambie, mi amor por ti solo crece. ¡Feliz día, mi vida! 💖";
+
+    // Corazones flotantes
+    function createHearts() {
+      const heartsContainer = document.getElementById('hearts');
+      for (let i = 0; i < 30; i++) {
+        const heart = document.createElement('div');
+        heart.innerHTML = '❤️';
+        heart.className = 'heart';
+        heart.style.left = Math.random() * 100 + 'vw';
+        heart.style.animationDelay = Math.random() * 8 + 's';
+        heart.style.fontSize = (Math.random() * 20 + 16) + 'px';
+        heartsContainer.appendChild(heart);
+      }
+    }
+
+    // Contador de días
+    function updateDays() {
+      const today = new Date();
+      const diffTime = Math.abs(today - startDate);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      daysElement.textContent = diffDays;
+    }
+
+    // Mostrar razones
+    function showReasons() {
+      reasons.forEach((reason, i) => {
+        setTimeout(() => {
+          const el = document.createElement('p');
+          el.className = 'reason';
+          el.textContent = reason;
+          reasonsContainer.appendChild(el);
+          setTimeout(() => el.classList.add('visible'), 10);
+        }, i * 1000);
+      });
+
+      setTimeout(() => {
+        finalMessage.textContent = specialMessage;
+        finalMessage.classList.add('show');
+      }, reasons.length * 1000 + 1000);
+    }
+
+    // Corazón ASCII
+    function generarCorazonASCII(nombre) {
+      let nombreCorto = nombre.length > 12 ? nombre.substring(0, 10) + '..' : nombre;
+      const heartShape = [
+        "      ******      ******      ",
+        "    **********  **********    ",
+        "  **************************  ",
+        " **************************** ",
+        " **************************** ",
+        "  **************************  ",
+        "    ************************  ",
+        "      ********************    ",
+        "        ****************      ",
+        "          ************        ",
+        "            ********          ",
+        "              ****            "
+      ];
+
+      let lines = [];
+      for (let i = 0; i < heartShape.length; i++) {
+        let linea = heartShape[i];
+        let lineaLlena = "";
+        for (let j = 0; j < linea.length; j++) {
+          if (linea[j] === '*') {
+            lineaLlena += nombreCorto[j % nombreCorto.length];
+          } else {
+            lineaLlena += " ";
+          }
+        }
+        lines.push(lineaLlena);
+      }
+
+      const centro = Math.floor(lines.length / 2);
+      const mensaje = " Te amo, " + nombreCorto + " ";
+      const startIdx = Math.max(0, Math.floor((lines[centro].length - mensaje.length) / 2));
+      lines[centro] = lines[centro].substring(0, startIdx) + mensaje + lines[centro].substring(startIdx + mensaje.length);
+
+      return lines.join('<br>');
+    }
+
+    // Evento del botón "Formar Corazón"
+    document.getElementById('formarBtn').addEventListener('click', function() {
+      const nombre = document.getElementById('nombreInput').value.trim();
+      if (!nombre) {
+        alert('Por favor, ingresa un nombre.');
+        return;
+      }
+      const resultadoDiv = document.getElementById('resultado');
+      const corazonDisplay = document.getElementById('corazonDisplay');
+      corazonDisplay.innerHTML = generarCorazonASCII(nombre);
+      resultadoDiv.classList.add('show');
+    });
+
+    // Iniciar todo al hacer clic en el botón principal
+    document.getElementById('startBtn').addEventListener('click', () => {
+      welcomeScreen.style.display = 'none';
+      container.classList.add('visible');
+      updateDays();
+      showReasons();
+      createHearts(); // Corazones flotantes aparecen con la carta
+    });
+  </script>
+</body>
+</html>
